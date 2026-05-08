@@ -79,12 +79,28 @@ for i in "${!COMMAND[@]}"; do
   else
     send_or_rcv="RECV"
   fi
+  d_pre_cli="${t_data_type[$ind]}"
+  d_data_types=()
+  d_descriptors=()
+  while IFS= read -r entry; do
+    d_data_types+=("$(echo "$entry" | awk 'BEGIN {FS=":"} {print $1}')")
+    d_descriptors+=("$(echo "$entry" | awk 'BEGIN {FS=":"} {print $2}')")
+  done < <(echo "$d_pre_cli" | awk 'BEGIN {FS=","} {for (i=1; i<=NF; i++) print $i}')
 
-  if [ "${t_data_type[$ind]}" = "None" ]; then
-    echo "$send_or_rcv ${ADDRESS[$i]}: " "${t_desc[$ind]}: No data"
+  if [ "${d_data_types[0]}" = "None" ]; then
+    echo "$send_or_rcv ${ADDRESS[$i]}: ${t_desc[$ind]}: No data"
   else
-    data_types="$(echo "${t_data_type[$ind]}" | tr ',' ' ')"
-    val="$(echo "${MSG[$i]}" | ./hex_to_int "${BYTES[$i]}" $data_types)"
-    echo "$send_or_rcv ${ADDRESS[$i]}" "${t_desc[$ind]}: $val"
+    raw="$(echo "${MSG[$i]}" | ./hex_to_int "${BYTES[$i]}" "${d_data_types[@]}")"
+    read -ra values <<<"$raw"
+
+    echo "$send_or_rcv ${ADDRESS[$i]} ${t_desc[$ind]}:"
+    v_idx=0
+    for d_idx in "${!d_data_types[@]}"; do
+      if [ "${d_data_types[$d_idx]}" = "NULL" ]; then
+        continue
+      fi
+      echo "  ${d_descriptors[$d_idx]}: ${values[$v_idx]}"
+      v_idx=$((v_idx + 1))
+    done
   fi
 done

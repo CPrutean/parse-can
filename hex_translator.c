@@ -34,12 +34,12 @@ int hex_to_int(const char *buffer) {
   return r;
 }
 
-const char *type_names[7] = {"int16_t", "Float",   "uint32_t", "int32_t",
-                             "int8_t",  "uint8_t", "uint16_t"};
-const int type_sizes[7] = {2, 4, 4, 4, 1, 1, 2};
+const char *type_names[8] = {"int16_t", "float",   "uint32_t", "int32_t",
+                             "int8_t",  "uint8_t", "uint16_t", "NULL"};
+const int type_sizes[8] = {2, 4, 4, 4, 1, 1, 2, 1};
 
 int index_of(const char *val) {
-  for (int i = 0; i < 7; i++) {
+  for (int i = 0; i < 8; i++) {
     if (strcmp(type_names[i], val) == 0) {
       return i;
     }
@@ -63,23 +63,6 @@ int main(int argc, char *argv[]) {
       break;
     data[c] = (uint8_t)hex_to_int(buffer + i);
     c++;
-  }
-  size_t offset = sizeof(data) - 4;
-  if (argc <= 3 && strcmp(argv[2], "Float") == 0) {
-    float f;
-    memcpy(&f, &data[offset], sizeof(float));
-    printf("%f\n", f);
-    return 0;
-  } else if (argc <= 3 && strcmp(argv[2], "int32_t") == 0) {
-    int32_t f;
-    memcpy(&f, &data[offset], sizeof(int32_t));
-    printf("%d\n", f);
-    return 0;
-  } else if (argc <= 3) {
-    uint32_t f;
-    memcpy(&f, &data[offset], sizeof(uint32_t));
-    printf("%d\n", f);
-    return 0;
   }
 
   int bytes_used = 0;
@@ -132,6 +115,9 @@ int main(int argc, char *argv[]) {
       printf("%u ", (unsigned int)u16);
       bytes_used += sizeof(uint16_t);
       break;
+    case 7: // NULL
+      bytes_used++;
+      continue;
     }
   }
   printf("\n");
