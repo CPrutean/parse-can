@@ -68,17 +68,17 @@ int main(int argc, char *argv[]) {
   if (argc <= 3 && strcmp(argv[2], "Float") == 0) {
     float f;
     memcpy(&f, &data[offset], sizeof(float));
-    printf("[float: %f]\n", f);
+    printf("%f\n", f);
     return 0;
   } else if (argc <= 3 && strcmp(argv[2], "int32_t") == 0) {
     int32_t f;
     memcpy(&f, &data[offset], sizeof(int32_t));
-    printf("[int32_t: %d]\n", f);
+    printf("%d\n", f);
     return 0;
   } else if (argc <= 3) {
     uint32_t f;
     memcpy(&f, &data[offset], sizeof(uint32_t));
-    printf("[uint32_t: %d]\n", f);
+    printf("%d\n", f);
     return 0;
   }
 
@@ -99,37 +99,37 @@ int main(int argc, char *argv[]) {
     switch (ind) {
     case 0: // int16_t
       memcpy(&i16, data + bytes_used, sizeof(int16_t));
-      printf("[int16: %d] ", (int)i16);
+      printf("%d ", (int)i16);
       bytes_used += sizeof(int16_t);
       break;
     case 1: // Float
       memcpy(&f, data + bytes_used, sizeof(float));
-      printf("[float: %.2f] ", f);
+      printf("%.2f ", f);
       bytes_used += sizeof(float);
       break;
     case 2: // uint32_t
       memcpy(&u32, data + bytes_used, sizeof(uint32_t));
-      printf("[uint32: %u] ", u32);
+      printf("%u ", u32);
       bytes_used += sizeof(uint32_t);
       break;
     case 3: // int32_t
       memcpy(&i32, data + bytes_used, sizeof(int32_t));
-      printf("[int32: %d] ", (int)i32);
+      printf("%d ", (int)i32);
       bytes_used += sizeof(int32_t);
       break;
     case 4: // int8_t
       memcpy(&i8, data + bytes_used, sizeof(int8_t));
-      printf("[int8: %d] ", (int)i8);
+      printf("%d ", (int)i8);
       bytes_used += sizeof(int8_t);
       break;
     case 5: // uint8_t
       memcpy(&ui8, data + bytes_used, sizeof(uint8_t));
-      printf("[uint8: %u] ", (unsigned int)ui8);
+      printf("%u ", (unsigned int)ui8);
       bytes_used += sizeof(uint8_t);
       break;
     case 6: // uint16_t
       memcpy(&u16, data + bytes_used, sizeof(uint16_t));
-      printf("[uint16: %u] ", (unsigned int)u16);
+      printf("%u ", (unsigned int)u16);
       bytes_used += sizeof(uint16_t);
       break;
     }
