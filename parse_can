@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+
+# field 1 is the canline
+# fields 2 is the address
+# field 3 is the amount of bytes
+# field 4 onward is the message
+CANLINE=()
+ADDRESS=()
+BYTES=()
+COMMAND=()
+MSG=()
+fname=""
+t_fname=""
+t_cmd_id=()
+t_desc=()
+t_data_type=()
+packets_sent=0
+packets_received=0
+
+handle_translation() {
+  #A translation file should be provided for easier readability
+  local __TRAN_FILENAME="$1"
+  while IFS='|' read -r cmd_id desc data_type; do
+    t_cmd_id+=("${cmd_id:2:2}")
+    t_desc+=("$desc")
+    t_data_type+=("$data_type")
+  done < <(tail -n +2 "$__TRAN_FILENAME")
+}
+
+index_of() {
+  local -n __TARGET_ARRAY=$1
+  local __TARGET="$2"
+  local __idx
+  for __idx in "${!__TARGET_ARRAY[@]}"; do
+    if [ "${__TARGET_ARRAY[$__idx]}" = "$__TARGET" ]; then
+      return "$__idx"
+    fi
+  done
+  return "255"
+}
+
+while getopts "ht:f:v" opt; do
+  case ${opt} in
+  t) handle_translation "$OPTARG" ;;
+  f) fname="$OPTARG" ;;
+  *) ;;
+  esac
+done
+
+readarray -t lines <"$fname"
+
+for line in "${lines[@]}"; do
+  CANLINE+=("$(echo "$line" | awk '{print $1}')")
+
+  adr1="$(echo "$line" | awk '{print $2}')"
+
+  ADDRESS+=("$adr1")
+
+  b1="$(echo "$line" | awk '{print $3}' | tr -d '[]')"
+  BYTES+=("$b1")
+
+  COMMAND+=("$(echo "$line" | awk '{print $4}')")
+
+  MSG+=("$(echo "$line" | awk -v b="$b1" '{for (i = 5; i <= b+3; i++) print $i}' | tr '\n' ' ')")
+done
+
+for i in "${!COMMAND[@]}"; do
+  index_of t_cmd_id "${COMMAND[$i]}"
+  ind=$?
+  if [ "$ind" = "255" ]; then
+    echo "Invalid command ID"
+    continue
+  fi
+
+  send_or_rcv=""
+
+  if [ "${ADDRESS[$i]:0:1}" = "1" ]; then
+    send_or_rcv="SEND"
+  else
+    send_or_rcv="RECV"
+  fi
+
+  if [ "${t_data_type[$ind]}" = "None" ]; then
+    echo "$send_or_rcv ${ADDRESS[$i]}: " "${t_desc[$ind]}: No data"
+  else
+    data_types="$(echo "${t_data_type[$ind]}" | tr ',' ' ')"
+    val="$(echo "${MSG[$i]}" | ./hex_to_int "${BYTES[$i]}" $data_types)"
+    echo "$send_or_rcv ${ADDRESS[$i]}" "${t_desc[$ind]}: $val"
+  fi
+done

@@ -1,0 +1,37 @@
+COMMAND_ID|DESCRIPTION|RESULTING_DATA_TYPES
+0x30|Read PID Parameter Command|Float
+0x31|Write PID Parameters to RAM Command|Float
+0x32|Write PID Parameters to ROM Command|Float
+0x42|Read Acceleration Command|int32_t
+0x43|Write Acceleration to RAM and ROM Command|uint32_t
+0x60|Read Multi-Turn Encoder Position Data Command|int32_t
+0x61|Read Multi-Turn Encoder Original Position Data Command|int32_t
+0x62|Read Multi-Turn Encoder Zero Offset Data Command|int32_t
+0x63|Write Encoder Multi-Turn Value to ROM as Motor Zero Command|int32_t
+0x64|Write Current Multi-Turn Position of Encoder to ROM as Motor Zero|int32_t
+0x90|Read Single-Turn Encoder Command|int16_t,int16_t,int16_t
+0x92|Read Multi-Turn Angle Command|int32_t
+0x94|Read Single-Turn Angle Command|uint16_t
+0x9A|Read Motor Status 1 and Error Flag Command|int8_t,uint16_t,uint16_t
+0x9C|Read Motor Status 2 Command|int8_t,int16_t,int16_t,int16_t
+0x9D|Read Motor Status 3 Command|int8_t,int16_t,int16_t,int16_t
+0x80|Motor Shutdown Command|None
+0x81|Motor Stop Command|None
+0xA1|Torque Closed-Loop Control Command|int8_t,int16_t,int16_t,int16_t
+0xA2|Speed Closed-Loop Control Command|int8_t,int16_t,int16_t,int16_t
+0xA4|Absolute Position Closed-Loop Control Command|int8_t,int16_t,int16_t,int16_t
+0xA6|Single-Turn Position Control Command|int8_t,int16_t,int16_t,uint16_t
+0xA8|Incremental Position Closed-Loop Control Command|int8_t,int16_t,int16_t,int16_t
+0x70|System Operating Mode Acquisition|uint8_t
+0x76|System Reset Command|None
+0x77|System Brake Release Command|None
+0x78|System Brake Lock Command|None
+0xB1|System Runtime Read Command|uint32_t
+0xB2|System Software Version Date Read Command|uint32_t
+0xB3|Communication Interruption Time Setting Command|uint32_t
+0xB4|Communication Baud Rate Setting Command|None
+0xB5|Motor Model Reading Command|char[7]
+0xB6|Active Reply Function Command|None
+0x20|Function Control Command|None
+0x79|CANID Setting Command|uint16_t
+0x400+ID|Motion Mode Control Command_CAN|None
