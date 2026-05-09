@@ -5,8 +5,8 @@ This project was a personal script that I was using to debug the myactuator RMDx
 > [!NOTE]
 > make sure to compile the `hex_translator.c` with whatever C compiler of your choice to `hex_to_int` since the can parser is dependent on that but if you'd like a specific way to do it run `gcc hex_translator.c -o hex_to_int`
 
-> > [!NOTE]
-> > For this to work the translation file you need relative path's to both files or they both need to be in the same working directory
+> [!NOTE]
+> For this to work the translation file you need relative path's to both files or they both need to be in the same working directory
 
 ## The workflow
 
