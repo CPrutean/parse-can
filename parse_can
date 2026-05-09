@@ -113,7 +113,7 @@ for line in "${lines[@]}"; do
 
   COMMAND+=("$(echo "$line" | awk '{print $4}')")
 
-  MSG+=("$(echo "$line" | awk -v b="$b1" '{for (i = 5; i <= b+3; i++) print $i}' | tr '\n' ' ')")
+  MSG+=("$(echo "$line" | awk -v b="$b1" '{for (i = 4; i <= b+3; i++) print $i}' | tr '\n' ' ')")
 done
 
 for i in "${!COMMAND[@]}"; do
