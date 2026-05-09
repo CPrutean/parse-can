@@ -1,3 +1,4 @@
+COMMAND_ID|DESCRIPTION|RESULTING_DATA_TYPES
 0x30|Read PID Parameter Command|uint8_t:Command Byte,uint8_t:Function Index,NULL,NULL,float:PID Parameter
 0x31|Write PID Parameters to RAM Command|uint8_t:Command Byte,uint8_t:Function Index,NULL,NULL,float:PID Parameter
 0x32|Write PID Parameters to ROM Command|uint8_t:Command Byte,uint8_t:Function Index,NULL,NULL,float:PID Parameter

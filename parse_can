@@ -16,6 +16,11 @@ t_desc=()
 t_data_type=()
 packets_sent=0
 packets_received=0
+color="true"
+oneline="false"
+
+BLUE="\e[0;34m"
+GREEN="\e[0;32m"
 
 handle_translation() {
   #A translation file should be provided for easier readability
@@ -26,6 +31,37 @@ handle_translation() {
     t_data_type+=("$data_type")
   done < <(tail -n +2 "$__TRAN_FILENAME")
 }
+
+print_help() {
+  cat << 'EOF' 
+
+
+  /$$$$$$   /$$$$$$   /$$$$$$   /$$$$$$$  /$$$$$$         /$$$$$$$  /$$$$$$  /$$$$$$$ 
+ /$$__  $$ |____  $$ /$$__  $$ /$$_____/ /$$__  $$       /$$_____/ |____  $$| $$__  $$
+| $$  \ $$  /$$$$$$$| $$  \__/|  $$$$$$ | $$$$$$$$      | $$        /$$$$$$$| $$  \ $$
+| $$  | $$ /$$__  $$| $$       \____  $$| $$_____/      | $$       /$$__  $$| $$  | $$
+| $$$$$$$/|  $$$$$$$| $$       /$$$$$$$/|  $$$$$$$      |  $$$$$$$|  $$$$$$$| $$  | $$
+| $$____/  \_______/|__/      |_______/  \_______//$$$$$$\_______/ \_______/|__/  |__/
+| $$                                             |______/                             
+| $$                                                                                  
+|__/                                                                                  
+
+
+OVERVIEW: can debugger tool from candump logs
+USAGE: parse_can -t <translation-file> -f <canlog-file>
+OPTIONS:
+  -t      Set the translation filename
+  -f      Set the canlog filename
+  -o      Set the output to spit everything out in one line
+  -c      Removes color output
+EOF
+
+}
+
+if [ $# = 0 ]; then
+  print_help
+  exit 0
+fi
 
 index_of() {
   local -n __TARGET_ARRAY=$1
@@ -39,13 +75,29 @@ index_of() {
   return "255"
 }
 
-while getopts "ht:f:v" opt; do
+while getopts "ht:ocf:" opt; do
   case ${opt} in
-  t) handle_translation "$OPTARG" ;;
+  t) handle_translation "$OPTARG"; t_fname="l" ;;
   f) fname="$OPTARG" ;;
-  *) ;;
+  h) print_help && exit 0 ;;
+  c) color="false";;
+  o) oneline="true" ;;
+  *) echo "Invalid flag try again" ;;
   esac
 done
+
+if  [ -z "$t_fname" ]; then
+  echo "Please provide a translation file"
+  exit 1
+fi
+
+
+
+if  [ -z "$fname" ]; then
+  echo "Please provide a file to be translated"
+  exit 1
+fi
+
 
 readarray -t lines <"$fname"
 
@@ -91,16 +143,42 @@ for i in "${!COMMAND[@]}"; do
     echo "$send_or_rcv ${ADDRESS[$i]}: ${t_desc[$ind]}: No data"
   else
     raw="$(echo "${MSG[$i]}" | ./hex_to_int "${BYTES[$i]}" "${d_data_types[@]}")"
-    read -ra values <<<"$raw"
+    read -ra values <<<"$raw  "
+    output_string=""
+    output_string+="$send_or_rcv ${ADDRESS[$i]}"
+    if [ "$color" = "true" ]; then
+      output_string+="$BLUE"
+    fi
+    output_string+=" ${t_desc[$ind]}:"
+    if [ "$color" = "true" ]; then
+      output_string+="\e[0m"
+    fi
+    output_string+=" \n"
 
-    echo "$send_or_rcv ${ADDRESS[$i]} ${t_desc[$ind]}:"
+
     v_idx=0
     for d_idx in "${!d_data_types[@]}"; do
       if [ "${d_data_types[$d_idx]}" = "NULL" ]; then
         continue
       fi
-      echo "  ${d_descriptors[$d_idx]}: ${values[$v_idx]}"
+      if [ "$color" = "true" ]; then
+        output_string+="$GREEN"
+      fi
+      output_string+="  ${d_descriptors[$d_idx]}: " 
+      if [ "$color" = "true" ]; then
+        output_string+="\e[0m"
+      fi
+
+      output_string+="${values[$v_idx]}"
+      output_string+=" \n"
       v_idx=$((v_idx + 1))
     done
+    
+    if [ "$oneline" = "true" ]; then
+      output_string="${output_string//\\n/}"
+    fi
+
+
+    echo -e "$output_string"
   fi
 done

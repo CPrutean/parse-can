@@ -48,6 +48,10 @@ int index_of(const char *val) {
 }
 
 int main(int argc, char *argv[]) {
+  if (argc < 3) {
+    fprintf(stderr, "Invalid please provide options");
+    exit(1);
+  }
   int num_bytes = atoi(argv[1]) - 1;
 
   char buffer[num_bytes * 3 + 2];
