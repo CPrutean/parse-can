@@ -4,11 +4,7 @@
 # fields 2 is the address
 # field 3 is the amount of bytes
 # field 4 onward is the message
-CANLINE=()
-ADDRESS=()
-BYTES=()
-COMMAND=()
-MSG=()
+
 fname=""
 t_fname=""
 t_cmd_id=()
@@ -55,6 +51,7 @@ OPTIONS:
   -o      Set the output to spit everything out in one line
   -c      Removes color output
 EOF
+  
 
 }
 
@@ -102,22 +99,18 @@ fi
 readarray -t lines <"$fname"
 
 for line in "${lines[@]}"; do
-  CANLINE+=("$(echo "$line" | awk '{print $1}')")
+  CANLINE="$(echo "$line" | awk '{print $1}')"
 
   adr1="$(echo "$line" | awk '{print $2}')"
 
-  ADDRESS+=("$adr1")
+  ADDRESS="$adr1"
 
   b1="$(echo "$line" | awk '{print $3}' | tr -d '[]')"
-  BYTES+=("$b1")
 
-  COMMAND+=("$(echo "$line" | awk '{print $4}')")
+  COMMAND="$(echo "$line" | awk '{print $4}')"
 
-  MSG+=("$(echo "$line" | awk -v b="$b1" '{for (i = 4; i <= b+3; i++) print $i}' | tr '\n' ' ')")
-done
-
-for i in "${!COMMAND[@]}"; do
-  index_of t_cmd_id "${COMMAND[$i]}"
+  MSG="$(echo "$line" | awk -v b="$b1" '{for (i = 4; i <= b+3; i++) print $i}' | tr '\n' ' ')"
+  index_of t_cmd_id "$COMMAND"
   ind=$?
   if [ "$ind" = "255" ]; then
     echo "Invalid command ID"
@@ -125,7 +118,6 @@ for i in "${!COMMAND[@]}"; do
   fi
 
   send_or_rcv=""
-
   if [ "${ADDRESS[$i]:0:1}" = "1" ]; then
     send_or_rcv="SEND"
   else
@@ -140,12 +132,12 @@ for i in "${!COMMAND[@]}"; do
   done < <(echo "$d_pre_cli" | awk 'BEGIN {FS=","} {for (i=1; i<=NF; i++) print $i}')
 
   if [ "${d_data_types[0]}" = "None" ]; then
-    echo "$send_or_rcv ${ADDRESS[$i]}: ${t_desc[$ind]}: No data"
+    echo "$send_or_rcv $ADDRESS: ${t_desc[$ind]}: No data"
   else
-    raw="$(echo "${MSG[$i]}" | ./hex_to_int "${BYTES[$i]}" "${d_data_types[@]}")"
+    raw="$(echo "$MSG" | ./hex_to_int "$BYTES" "${d_data_types[@]}")"
     read -ra values <<<"$raw  "
     output_string=""
-    output_string+="$send_or_rcv ${ADDRESS[$i]}"
+    output_string+="$send_or_rcv $ADDRESS"
     if [ "$color" = "true" ]; then
       output_string+="$BLUE"
     fi
@@ -181,4 +173,7 @@ for i in "${!COMMAND[@]}"; do
 
     echo -e "$output_string"
   fi
+
+
 done
+
